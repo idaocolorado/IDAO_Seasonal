@@ -82,11 +82,14 @@ pValueAnova <- round(anovaSteps$`Pr(>F)`[1], 3)
 
 # Plot mean
 col.means = apply(stepsm,2,mean)
-plot(col.means,type="b", main="Daily Means Plot for Steps", xlab="Day of Week", ylab="Mean Steps/day")
+plot(col.means,type="b", 
+     main="Daily Means Plot for Steps", 
+     xlab="Day of Week", 
+     ylab="Mean Steps/day")
 legend("topleft", #Location
        c(paste("P value for difference across days =", pValueAnova)), #Text
        bty= "n", #No border ("o" if border)
-       cex=0.9 #Text size
+       cex=1.5 #Text size
 )
 dev.off()
 
@@ -111,11 +114,12 @@ pValueAnova2 <- round(anovaSleep$`Pr(>F)`[1], 3)
 col.means.sleep = apply(sleepm,2,mean)
 plot(col.means.sleep,type="b", 
      main="Daily Means Plot for Minutes Asleep", 
-     xlab="Day of Week", ylab="Mean Minutes Asleep/day")
-legend("topright", #Location
+     xlab="Day of Week", 
+     ylab="Mean Minutes Asleep/day")
+legend("top", #Location
        c(paste("P value for difference across days =", pValueAnova2)), #Text
        bty= "n", #No border ("o" if border)
-       cex=0.9 #Text size
+       cex=1.5 #Text size
 )
 dev.off()
 
