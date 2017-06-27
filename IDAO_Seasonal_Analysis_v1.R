@@ -32,9 +32,39 @@ attach(fitbit)
 #############################################################################
 # Frequency plot from prior post
 
-fileName1 = "/freqencyPlot.jpeg"
+fileName1 = "./freqencyPlot.jpeg"
 jpeg(filename=fileName1, width = 800, height = 600, quality=90)
 x = diff(Minutes.Asleep)
+FF = abs(fft(x)/sqrt(length(x)))^2  # Need to square and normalize raw fft output
+P = (4/(length(FF)))*FF[1:(((length(FF))/2)+1)] # Periodogram values (can scale by multiplying times 4/n)
+f = (0:(length(FF)/2))/length(FF) # Harmonic frequencies (from 0 to 0.5)
+P.filter = filter(P, c(rep(0.2, 5)), side=2) # Linear filter for plot
+#P.filter = lowess(f, P, f=1/15)
+plot(f, P, type="l", main="Spectral Plot", xlab="Frequency", ylab="Periodogram")
+lines(f, P.filter$y, col="red")
+# Quantitatively identify period/cycle
+Spect <- as.data.frame(cbind(f, P))
+Spect <- Spect[order(Spect$P, decreasing=TRUE)]  # Sort Spectrum from highest to lowest
+predcycle <- Spect[Spect$P==max(Spect$P),] # Find frequency where scaled Periodogram is maximal
+(Period = 1/predcycle$f) # Identify cycle/period
+abline(v=predcycle$f, col="blue")
+abline(v=1/7, col="green")
+abline(v=1/14, col="orange")
+abline(v=1/30, col="purple")
+legend(0, max(P), #Location
+       c(paste("Dominant frequency (Period=", round(Period, 2), ")"), "Weekly", "Bi-weekly", "Monthly"), #Text
+       col=c("blue", "green", "orange", "purple"), #Line colors
+       lty=c(1,1,1,1), #Line types
+       lwd=c(2.0, 2.0, 2.0, 2.0), #Line thickness
+       bty="o", #No border ("o" if border)
+       cex=0.9, #Text size
+       y.intersp=0.9 #Spacing between text/lines
+) 
+dev.off()
+
+fileName6 = "./freqencyPlotSteps.jpeg"
+jpeg(filename=fileName6, width = 800, height = 600, quality=90)
+x = diff(Steps)
 FF = abs(fft(x)/sqrt(length(x)))^2  # Need to square and normalize raw fft output
 P = (4/(length(FF)))*FF[1:(((length(FF))/2)+1)] # Periodogram values (can scale by multiplying times 4/n)
 f = (0:(length(FF)/2))/length(FF) # Harmonic frequencies (from 0 to 0.5)
@@ -181,4 +211,14 @@ legend("top", #Location
        cex=1.5 #Text size
 )
 dev.off()
+
+####################################################################################
+# Iterative auto.arima models
+
+model1 <- auto.arima(ts(Steps, frequency = 7))
+model2 <- auto.arima(ts(Steps, frequency = 14))
+model3 <- auto.arima(ts(Minutes.Asleep, frequency = 7))
+model4 <- auto.arima(ts(Minutes.Asleep, frequency = 14))
+
+
 
