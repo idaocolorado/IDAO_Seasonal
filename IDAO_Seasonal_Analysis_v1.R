@@ -70,15 +70,15 @@ jpeg(filename=fileName2, width = 800, height = 600, quality=90)
 stepsm = matrix(Steps, ncol=7,byrow=TRUE)
 
 #Stats to assess anova
-colnames(stepsm) <- c("1", "2", "3", "4", "5", "6", "7")
+colnames(stepsm) <- c(rep(1:7,1))
 stepsm <- as.data.frame(stepsm)
-stepsmreshape <- reshape(stepsm, varying = c("1", "2", "3", "4", "5", "6", "7"), 
+stepsmreshape <- reshape(stepsm, varying = c(rep(1:7,1)), 
                          v.names = "Steps", 
                          timevar = "Day", 
-                         times = c("1", "2", "3", "4", "5", "6", "7"), 
+                         times = c(rep(1:7, 1)), 
                          direction = "long")
 anovaSteps <- anova(lm(stepsmreshape$Steps ~ stepsmreshape$Day))
-pValueAnova <- round(anovaSteps$`Pr(>F)`[1], 3)
+pValueAnova <- round(anovaSteps$`Pr(>F)`[1], 4)
 
 # Plot mean
 col.means = apply(stepsm,2,mean)
@@ -100,15 +100,15 @@ jpeg(filename=fileName3, width = 800, height = 600, quality=90)
 sleepm = matrix(Minutes.Asleep, ncol=7,byrow=TRUE)
 
 #Stats to assess anova
-colnames(sleepm) <- c("1", "2", "3", "4", "5", "6", "7")
+colnames(sleepm) <- c(rep(1:7, 1))
 sleepm <- as.data.frame(sleepm)
-sleepmreshape <- reshape(sleepm, varying = c("1", "2", "3", "4", "5", "6", "7"), 
+sleepmreshape <- reshape(sleepm, varying = c(rep(1:7, 1)), 
                          v.names = "MinutesAsleep", 
                          timevar = "Day", 
-                         times = c("1", "2", "3", "4", "5", "6", "7"), 
+                         times = c(rep(1:7, 1)), 
                          direction = "long")
 anovaSleep <- anova(lm(sleepmreshape$MinutesAsleep ~ sleepmreshape$Day))
-pValueAnova2 <- round(anovaSleep$`Pr(>F)`[1], 3)
+pValueAnova2 <- round(anovaSleep$`Pr(>F)`[1], 4)
 
 # Plot mean
 col.means.sleep = apply(sleepm,2,mean)
@@ -123,4 +123,62 @@ legend("top", #Location
 )
 dev.off()
 
+# Average values by day of two week cycle
+
+fileName4 = "./monthlySteps.jpg"
+jpeg(filename=fileName4, width = 800, height = 600, quality=90)
+stepsmonth = matrix(Steps, ncol=14, byrow=TRUE)
+
+#Stats to assess anova
+colnames(stepsmonth) <- c(rep(1:14,1))
+stepsm <- as.data.frame(stepsmonth)
+stepsmonthreshape <- reshape(stepsmonth, varying = c(rep(1:14,1)), 
+                         v.names = "Steps", 
+                         timevar = "Day", 
+                         times = c(rep(1:14, 1)), 
+                         direction = "long")
+anovaSteps2 <- anova(lm(stepsmonthreshape$Steps ~ stepsmonthreshape$Day))
+pValueAnova3 <- round(anovaSteps$`Pr(>F)`[1], 4)
+
+# Plot mean
+col.means3 = apply(stepsmonth,2,mean)
+plot(col.means3,type="b", 
+     main="Biweekly Means Plot for Steps", 
+     xlab="Day of Two Week cycle", 
+     ylab="Mean Steps/day")
+legend("topleft", #Location
+       c(paste("P value for difference across days =", pValueAnova3)), #Text
+       bty= "n", #No border ("o" if border)
+       cex=1.5 #Text size
+)
+dev.off()
+
+## Repeat for sleep
+fileName5 = "./biweeklySleep.jpg"
+jpeg(filename=fileName5, width = 800, height = 600, quality=90)
+sleepmonth = matrix(Minutes.Asleep, ncol=14,byrow=TRUE)
+
+#Stats to assess anova
+colnames(sleepmonth) <- c(rep(1:14, 1))
+sleepmonth <- as.data.frame(sleepmonth)
+sleepmonthreshape <- reshape(sleepmonth, varying = c(rep(1:14, 1)), 
+                         v.names = "MinutesAsleep", 
+                         timevar = "Day", 
+                         times = c(rep(1:14, 1)), 
+                         direction = "long")
+anovaSleep2 <- anova(lm(sleepmonthreshape$MinutesAsleep ~ sleepmonthreshape$Day))
+pValueAnova4 <- round(anovaSleep2$`Pr(>F)`[1], 4)
+
+# Plot mean
+col.means.sleep2 = apply(sleepmonth,2,mean)
+plot(col.means.sleep2,type="b", 
+     main="Biweekly Means Plot for Minutes Asleep", 
+     xlab="Day of Two week cycle", 
+     ylab="Mean Minutes Asleep/day")
+legend("top", #Location
+       c(paste("P value for difference across days =", pValueAnova4)), #Text
+       bty= "n", #No border ("o" if border)
+       cex=1.5 #Text size
+)
+dev.off()
 
